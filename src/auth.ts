@@ -1,8 +1,10 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import clientPromise from "@/lib/mongodb";
+import { authConfig } from "./auth.config";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+    ...authConfig,
     trustHost: true,
     providers: [
         Credentials({
@@ -31,9 +33,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 }
 
                 return {
-                    id: user.id, // Using our custom ID field
-                    name: user.name,
-                    email: user.email,
+                    id: user.id as string, // Using our custom ID field
+                    name: user.name as string,
+                    email: user.email as string,
                 };
             },
         }),
@@ -42,6 +44,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         strategy: "jwt",
     },
     callbacks: {
+        ...authConfig.callbacks,
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
@@ -54,8 +57,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             }
             return session;
         },
-    },
-    pages: {
-        signIn: "/login",
     },
 });
