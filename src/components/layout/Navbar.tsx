@@ -7,6 +7,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { toast } from "react-toastify";
 
 export default function Navbar() {
     const { data: session } = useSession();
@@ -14,6 +15,11 @@ export default function Navbar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const handleLogout = async () => {
+        toast.success("Successfully logged out!");
+        signOut({ callbackUrl: "/login" });
+    };
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -100,7 +106,7 @@ export default function Navbar() {
             <ConfirmationModal
                 isOpen={logoutModalOpen}
                 onClose={() => setLogoutModalOpen(false)}
-                onConfirm={() => signOut({ callbackUrl: "/login" })}
+                onConfirm={handleLogout}
                 title="Sign Out"
                 message="Are you sure you want to sign out of your account?"
                 confirmText="Sign Out"

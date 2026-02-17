@@ -9,6 +9,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import EntryModal from "@/components/entries/EntryModal";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import Button from "@/components/ui/Button";
+import { toast } from "react-toastify";
 import {
     ArrowLeftIcon,
     PlusIcon,
@@ -92,6 +93,7 @@ export default function WeekDetailPage() {
             await deleteEntry(weekId, entryToDelete.id);
             await loadData();
             setDeleteModalOpen(false);
+            toast.success("Entry deleted successfully");
         } catch (err) {
             console.error("Failed to delete entry:", err);
         } finally {
@@ -109,8 +111,10 @@ export default function WeekDetailPage() {
     }) => {
         if (editingEntry) {
             await updateEntry(weekId, editingEntry.id, data);
+            toast.success("Entry updated successfully");
         } else {
             await createEntry(weekId, data);
+            toast.success("Entry created successfully");
         }
         await loadData();
     };

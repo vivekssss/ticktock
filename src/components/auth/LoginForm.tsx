@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -61,6 +62,7 @@ export default function LoginForm() {
             if (result?.error) {
                 setError("Invalid email or password. Please try again.");
             } else {
+                toast.success("Successfully logged in!");
                 router.push("/dashboard");
                 router.refresh();
             }
