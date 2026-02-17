@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 export default function Navbar() {
     const { data: session } = useSession();
     const pathname = usePathname();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -81,7 +83,10 @@ export default function Navbar() {
                                     </p>
                                 </div>
                                 <button
-                                    onClick={() => signOut({ callbackUrl: "/login" })}
+                                    onClick={() => {
+                                        setDropdownOpen(false);
+                                        setLogoutModalOpen(true);
+                                    }}
                                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                 >
                                     Sign out
@@ -91,6 +96,16 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={logoutModalOpen}
+                onClose={() => setLogoutModalOpen(false)}
+                onConfirm={() => signOut({ callbackUrl: "/login" })}
+                title="Sign Out"
+                message="Are you sure you want to sign out of your account?"
+                confirmText="Sign Out"
+                variant="danger"
+            />
         </nav>
     );
 }

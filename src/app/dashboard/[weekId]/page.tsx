@@ -7,6 +7,7 @@ import { WeeklyTimesheet, TimesheetEntry } from "@/types";
 import { formatDateRange, formatShortDate } from "@/lib/utils";
 import ProgressBar from "@/components/ui/ProgressBar";
 import EntryModal from "@/components/entries/EntryModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import Button from "@/components/ui/Button";
 import {
     ArrowLeftIcon,
@@ -26,6 +27,9 @@ export default function WeekDetailPage() {
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [entryToDelete, setEntryToDelete] = useState<TimesheetEntry | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>("");
 
@@ -74,15 +78,25 @@ export default function WeekDetailPage() {
         setMenuOpen(null);
     };
 
-    const handleDeleteEntry = async (entry: TimesheetEntry) => {
+    const handleDeleteClick = (entry: TimesheetEntry) => {
+        setEntryToDelete(entry);
+        setDeleteModalOpen(true);
         setMenuOpen(null);
-        if (!confirm("Are you sure you want to delete this entry?")) return;
+    };
 
+    const confirmDeleteEntry = async () => {
+        if (!entryToDelete) return;
+
+        setIsDeleting(true);
         try {
-            await deleteEntry(weekId, entry.id);
+            await deleteEntry(weekId, entryToDelete.id);
             await loadData();
+            setDeleteModalOpen(false);
         } catch (err) {
             console.error("Failed to delete entry:", err);
+        } finally {
+            setIsDeleting(false);
+            setEntryToDelete(null);
         }
     };
 
@@ -161,106 +175,105 @@ export default function WeekDetailPage() {
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-10 max-w-[1200px] mx-auto min-h-[90vh]">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-12">
                 <div>
                     <button
                         onClick={() => router.push("/dashboard")}
-                        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-3 transition-colors"
+                        className="flex items-center gap-1.5 text-[13px] font-medium text-gray-400 hover:text-gray-600 mb-6 transition-colors group"
                     >
-                        <ArrowLeftIcon className="h-4 w-4" />
+                        <ArrowLeftIcon className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
                         Back to timesheets
                     </button>
-                    <h1 className="text-xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                         This week&apos;s timesheet
                     </h1>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-400 mt-1 font-medium">
                         {formatDateRange(week.startDate, week.endDate)}
                     </p>
                 </div>
-                <ProgressBar current={week.totalHours} max={40} />
+                <div className="md:mt-2">
+                    <ProgressBar current={week.totalHours} max={40} />
+                </div>
             </div>
 
             {/* Day-by-day entries */}
-            <div className="space-y-2">
+            <div className="space-y-10">
                 {getDatesInRange().map((date) => {
                     const dayEntries = entriesByDate(date);
+                    const formattedDate = formatShortDate(date); // e.g., "Jan 21"
 
                     return (
-                        <div key={date} className="border-b border-gray-100 pb-4 last:border-b-0">
-                            <div className="flex items-start gap-6 py-3">
-                                {/* Date label */}
-                                <div className="w-20 shrink-0">
-                                    <p className="text-sm font-semibold text-gray-900">
-                                        {formatShortDate(date)}
-                                    </p>
-                                </div>
+                        <div key={date} className="flex flex-col md:flex-row gap-4 md:gap-10">
+                            {/* Date label */}
+                            <div className="w-24 shrink-0 pt-3">
+                                <p className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+                                    {formattedDate}
+                                </p>
+                            </div>
 
-                                {/* Entries */}
-                                <div className="flex-1 space-y-2">
-                                    {dayEntries.length > 0 ? (
-                                        dayEntries.map((entry) => (
-                                            <div
-                                                key={entry.id}
-                                                className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 group transition-colors"
-                                            >
-                                                <div className="flex-1">
-                                                    <span className="text-sm text-gray-700">
-                                                        {entry.taskDescription}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-4">
-                                                    <span className="text-sm text-gray-500">
-                                                        {entry.hours} hrs
-                                                    </span>
-                                                    <span className="text-xs font-medium text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded">
-                                                        {entry.project}
-                                                    </span>
-                                                    <div className="relative">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setMenuOpen(
-                                                                    menuOpen === entry.id ? null : entry.id
-                                                                );
-                                                            }}
-                                                            className="p-1 rounded hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <EllipsisHorizontalIcon className="h-5 w-5 text-gray-400" />
-                                                        </button>
-
-                                                        {menuOpen === entry.id && (
-                                                            <div className="absolute right-0 top-8 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                                                                <button
-                                                                    onClick={() => handleEditEntry(entry)}
-                                                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDeleteEntry(entry)}
-                                                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : null}
-
-                                    {/* Add new task button */}
-                                    <button
-                                        onClick={() => handleAddEntry(date)}
-                                        className="flex items-center gap-1.5 text-sm text-[#2563EB] hover:text-[#1D4ED8] py-2 px-3 rounded-lg border border-dashed border-blue-200 hover:border-blue-400 w-full justify-center transition-colors"
+                            {/* Entries container */}
+                            <div className="flex-1 space-y-2">
+                                {dayEntries.map((entry) => (
+                                    <div
+                                        key={entry.id}
+                                        className="relative flex items-center justify-between py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:border-blue-200 group transition-all duration-200"
                                     >
-                                        <PlusIcon className="h-4 w-4" />
-                                        Add new task
-                                    </button>
-                                </div>
+                                        <div className="flex-1 min-w-0 pr-4">
+                                            <span className="text-[13px] text-gray-700 font-medium truncate block">
+                                                {entry.taskDescription}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-6 shrink-0">
+                                            <span className="text-[12px] text-gray-400 font-medium whitespace-nowrap">
+                                                {entry.hours} hrs
+                                            </span>
+                                            <span className="text-[10px] font-bold text-[#2563EB] bg-[#EFF6FF] border border-[#DBEAFE] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                                {entry.project}
+                                            </span>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setMenuOpen(
+                                                            menuOpen === entry.id ? null : entry.id
+                                                        );
+                                                    }}
+                                                    className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
+                                                >
+                                                    <EllipsisHorizontalIcon className="h-5 w-5" />
+                                                </button>
+
+                                                {menuOpen === entry.id && (
+                                                    <div className="absolute right-0 top-10 w-36 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                                                        <button
+                                                            onClick={() => handleEditEntry(entry)}
+                                                            className="w-full text-left px-5 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-50 hover:text-[#2563EB] transition-colors"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteClick(entry)}
+                                                            className="w-full text-left px-5 py-2 text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* Add new task button */}
+                                <button
+                                    onClick={() => handleAddEntry(date)}
+                                    className="flex items-center gap-2 text-[11px] font-bold text-[#2563EB] py-2.5 px-5 rounded-xl border-2 border-dashed border-blue-200 bg-[#EFF6FF]/60 hover:bg-[#EFF6FF] w-full justify-center transition-all group"
+                                >
+                                    <PlusIcon className="h-4 w-4 transition-transform group-hover:scale-110" />
+                                    <span className="uppercase tracking-widest">Add new task</span>
+                                </button>
                             </div>
                         </div>
                     );
@@ -278,6 +291,25 @@ export default function WeekDetailPage() {
                 entry={editingEntry}
                 date={selectedDate}
             />
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={confirmDeleteEntry}
+                title="Delete Entry"
+                message="Are you sure you want to delete this timesheet entry? This action cannot be undone."
+                confirmText="Delete Entry"
+                variant="danger"
+                isLoading={isDeleting}
+            />
+
+            {/* Footer space */}
+            <div className="mt-20 py-8 border-t border-gray-50 flex justify-center">
+                <p className="text-[11px] text-gray-300 font-medium uppercase tracking-[0.2em]">
+                    © 2024 tentwenty. All rights reserved.
+                </p>
+            </div>
         </div>
     );
 }

@@ -13,20 +13,22 @@ export default function ProgressBar({ current, max, className }: ProgressBarProp
     const isComplete = current >= max;
 
     return (
-        <div className={cn("flex items-center gap-3", className)}>
-            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                {current}/{max} hrs
-            </span>
-            <div className="relative w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className={cn("flex flex-col items-end gap-1.5 min-w-[180px]", className)}>
+            <div className="flex justify-between items-baseline w-full px-0.5">
+                <span className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">
+                    {current}/{max} hrs
+                </span>
+                <span className="text-[10px] text-gray-400 font-medium">{percentage}%</span>
+            </div>
+            <div className="relative w-full h-[6px] bg-gray-100 rounded-full overflow-hidden">
                 <div
                     className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        isComplete ? "bg-green-500" : current > 0 ? "bg-orange-500" : "bg-gray-300"
+                        "h-full rounded-full transition-all duration-700 ease-out",
+                        isComplete ? "bg-green-500" : current > 0 ? "bg-[#FF8A65]" : "bg-gray-200"
                     )}
                     style={{ width: `${percentage}%` }}
                 />
             </div>
-            <span className="text-xs text-gray-500">{percentage}%</span>
         </div>
     );
 }
