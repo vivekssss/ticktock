@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "@/lib/mongodb";
 
 export const authOptions: NextAuthOptions = {
+
     providers: [
         CredentialsProvider({
             name: "Credentials",

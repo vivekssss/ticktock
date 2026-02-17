@@ -5,11 +5,13 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function LoginForm() {
     const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("john@example.com");
+    const [password, setPassword] = useState("password123");
+    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +79,12 @@ export default function LoginForm() {
                 </div>
             )}
 
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                <p className="font-medium mb-1">Default Credentials:</p>
+                <p>Email: <span className="font-mono">john@example.com</span></p>
+                <p>Password: <span className="font-mono">password123</span></p>
+            </div>
+
             <Input
                 id="email"
                 label="Email"
@@ -91,12 +99,25 @@ export default function LoginForm() {
             <Input
                 id="password"
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={passwordError}
                 autoComplete="current-password"
+                suffix={
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                    >
+                        {showPassword ? (
+                            <EyeSlashIcon className="h-5 w-5" />
+                        ) : (
+                            <EyeIcon className="h-5 w-5" />
+                        )}
+                    </button>
+                }
             />
 
             <label className="flex items-center gap-2 cursor-pointer">
