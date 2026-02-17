@@ -3,6 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "@/lib/mongodb";
 
 export const authOptions: NextAuthOptions = {
+    // @ts-expect-error trustHost is a valid option in newer NextAuth versions but generic types might not reflect it yet
+    trustHost: true,
+
 
     providers: [
         CredentialsProvider({
