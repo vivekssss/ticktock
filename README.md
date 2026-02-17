@@ -113,7 +113,7 @@ Tests cover:
 
 ## 📝 Assumptions
 
-- Mock data is stored in-memory (resets on server restart)
+- Mock data is stored in-memory / mongodb atlas
 - A "week" is Monday–Friday (5 working days)
 - 40 hours = completed, >0 but <40 = incomplete, 0 = missing
 - Single user system (one mock user for demo purposes)
