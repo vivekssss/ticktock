@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
 import clientPromise from "@/lib/mongodb";
 
 async function recalculateWeekStatus(db: any, weekId: string) {
@@ -24,7 +23,7 @@ export async function PUT(
     request: NextRequest,
     { params }: { params: Promise<{ weekId: string; entryId: string }> }
 ) {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -72,7 +71,7 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ weekId: string; entryId: string }> }
 ) {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }

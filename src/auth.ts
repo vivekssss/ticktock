@@ -1,14 +1,11 @@
-import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import clientPromise from "@/lib/mongodb";
 
-export const authOptions: NextAuthOptions = {
-    // @ts-expect-error trustHost is a valid option in newer NextAuth versions but generic types might not reflect it yet
+export const { auth, handlers, signIn, signOut } = NextAuth({
     trustHost: true,
-
-
     providers: [
-        CredentialsProvider({
+        Credentials({
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "email" },
@@ -61,5 +58,4 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: "/login",
     },
-    secret: process.env.NEXTAUTH_SECRET,
-};
+});

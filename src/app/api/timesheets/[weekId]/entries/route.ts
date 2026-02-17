@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
 import clientPromise from "@/lib/mongodb";
 import { generateId } from "@/data/entries"; // We can still use this unique ID generator or use UUID
 
@@ -25,7 +24,7 @@ export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ weekId: string }> }
 ) {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
