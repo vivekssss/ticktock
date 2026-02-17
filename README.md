@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ticktock — Timesheet Management App
 
-## Getting Started
+A SaaS-style timesheet management application built as a front-end technical assessment.
 
-First, run the development server:
+## 🛠 Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: TailwindCSS 4
+- **Auth**: [NextAuth.js](https://next-auth.js.org/) (Credentials Provider)
+- **Icons**: [Heroicons](https://heroicons.com/)
+- **Date Formatting**: [date-fns](https://date-fns.org/)
+- **Testing**: Jest + React Testing Library
+- **Font**: [Inter](https://fonts.google.com/specimen/Inter)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repo-url>
+cd ticktock
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Login Credentials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Field    | Value            |
+|----------|------------------|
+| Email    | john@example.com |
+| Password | password123      |
 
-## Learn More
+## 📁 Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                     # Next.js App Router pages
+│   ├── api/                 # Internal API routes
+│   │   ├── auth/            # NextAuth handler
+│   │   └── timesheets/      # Timesheet CRUD endpoints
+│   ├── dashboard/           # Dashboard + weekly detail pages
+│   └── login/               # Login page
+├── components/              # Reusable components
+│   ├── auth/                # LoginForm
+│   ├── entries/             # EntryModal
+│   ├── layout/              # Navbar, Footer
+│   ├── timesheets/          # Table, Filters, Pagination, StatusBadge
+│   └── ui/                  # Button, Input, Select, Modal, ProgressBar
+├── data/                    # Mock data (users, timesheets, entries)
+├── lib/                     # Utilities (auth config, API client, helpers)
+├── providers/               # SessionProvider wrapper
+├── types/                   # TypeScript type definitions
+└── __tests__/               # Unit tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🏗 Architecture Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### API Layer
+- All client-side data access goes through **internal Next.js API routes** (`/api/*`)
+- Mock data is consumed **only** by server-side API handlers — never directly in components
+- API routes support filtering, sorting, and pagination
 
-## Deploy on Vercel
+### Authentication
+- NextAuth with CredentialsProvider validates against mock user data
+- JWT session strategy for stateless auth
+- Protected routes via middleware (`/dashboard/*`)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### State Management
+- React hooks (`useState`, `useEffect`, `useCallback`) for local state
+- Data fetching through typed API helpers in `lib/api.ts`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Component Design
+- Small, focused, reusable components
+- Shared UI primitives: `Button`, `Input`, `Select`, `Modal`
+- Clear separation: layout → page → feature → UI components
+
+## 🧪 Running Tests
+
+```bash
+npm test
+```
+
+Tests cover:
+- **StatusBadge**: Correct rendering and styling for each status
+- **Pagination**: Page numbers, navigation, disabled states
+- **Button**: Variants, loading state, click handling
+- **Utils**: Date formatting, status colors, class merging
+
+## 🔑 Key Features
+
+1. **Login**: Split-layout login page with form validation and error handling
+2. **Dashboard**: Weekly timesheets table with status badges, sorting, filtering, and pagination
+3. **Weekly Detail**: Day-by-day view with progress bar, add/edit/delete entries
+4. **Entry Modal**: Full CRUD with project/work type selectors and validation
+5. **Responsive**: Works on mobile, tablet, and desktop
+6. **Protected Routes**: Auth guard via NextAuth middleware
+
+## ⏱ Time Spent
+
+~3 hours
+
+## 📝 Assumptions
+
+- Mock data is stored in-memory (resets on server restart)
+- A "week" is Monday–Friday (5 working days)
+- 40 hours = completed, >0 but <40 = incomplete, 0 = missing
+- Single user system (one mock user for demo purposes)
+- Date range filter checks if a week's dates fall within the selected range
