@@ -4,7 +4,7 @@ import Link from "next/link";
 import { WeeklyTimesheet } from "@/types";
 import { formatDateRange, cn } from "@/lib/utils";
 import StatusBadge from "./StatusBadge";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ArrowUpIcon, ArrowSmallDownIcon } from "@heroicons/react/24/outline";
 
 interface TimesheetTableProps {
     timesheets: WeeklyTimesheet[];
@@ -14,13 +14,16 @@ interface TimesheetTableProps {
 }
 
 function SortIcon({ column, sortBy, sortOrder }: { column: string; sortBy: string; sortOrder: string }) {
-    if (sortBy !== column) {
-        return <ChevronDownIcon className="h-3.5 w-3.5 text-gray-400 ml-1" />;
-    }
-    return sortOrder === "asc" ? (
-        <ChevronUpIcon className="h-3.5 w-3.5 text-gray-700 ml-1" />
-    ) : (
-        <ChevronDownIcon className="h-3.5 w-3.5 text-gray-700 ml-1" />
+    return (
+        <div className="flex flex-col ml-1.5 transition-opacity">
+            <ArrowUpIcon
+                className={cn(
+                    "h-3 w-3 transition-all duration-200",
+                    sortBy === column ? "text-gray-900 opacity-100" : "text-gray-500 opacity-60 group-hover:opacity-100",
+                    sortBy === column && sortOrder === "desc" && "rotate-180"
+                )}
+            />
+        </div>
     );
 }
 
@@ -65,72 +68,74 @@ export default function TimesheetTable({
     }
 
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full">
-                <thead>
-                    <tr className="border-b border-gray-200">
-                        <th
-                            className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none"
-                            onClick={() => onSort("weekNumber")}
-                        >
-                            <span className="flex items-center">
-                                Week #
-                                <SortIcon column="weekNumber" sortBy={sortBy} sortOrder={sortOrder} />
-                            </span>
-                        </th>
-                        <th
-                            className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none"
-                            onClick={() => onSort("startDate")}
-                        >
-                            <span className="flex items-center">
-                                Date
-                                <SortIcon column="startDate" sortBy={sortBy} sortOrder={sortOrder} />
-                            </span>
-                        </th>
-                        <th
-                            className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none"
-                            onClick={() => onSort("status")}
-                        >
-                            <span className="flex items-center">
-                                Status
-                                <SortIcon column="status" sortBy={sortBy} sortOrder={sortOrder} />
-                            </span>
-                        </th>
-                        <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                    {timesheets.map((timesheet) => (
-                        <tr
-                            key={timesheet.id}
-                            className="hover:bg-gray-50 transition-colors"
-                        >
-                            <td className="py-4 px-4 text-sm text-gray-900 font-medium">
-                                {timesheet.weekNumber}
-                            </td>
-                            <td className="py-4 px-4 text-sm text-gray-600">
-                                {formatDateRange(timesheet.startDate, timesheet.endDate)}
-                            </td>
-                            <td className="py-4 px-4">
-                                <StatusBadge status={timesheet.status} />
-                            </td>
-                            <td className="py-4 px-4 text-right">
-                                <Link
-                                    href={`/dashboard/${timesheet.id}`}
-                                    className={cn(
-                                        "text-sm font-medium transition-colors",
-                                        getActionColor(timesheet.status)
-                                    )}
-                                >
-                                    {getActionLabel(timesheet.status)}
-                                </Link>
-                            </td>
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-[#F9FAFB] border-b border-gray-200">
+                        <tr>
+                            <th
+                                className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider cursor-pointer select-none border-r border-gray-100/50 w-[140px]"
+                                onClick={() => onSort("weekNumber")}
+                            >
+                                <span className="flex items-center group">
+                                    WEEK #
+                                    <SortIcon column="weekNumber" sortBy={sortBy} sortOrder={sortOrder} />
+                                </span>
+                            </th>
+                            <th
+                                className="py-4 px-6 text-[11px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer select-none"
+                                onClick={() => onSort("startDate")}
+                            >
+                                <span className="flex items-center group">
+                                    DATE
+                                    <SortIcon column="startDate" sortBy={sortBy} sortOrder={sortOrder} />
+                                </span>
+                            </th>
+                            <th
+                                className="py-4 px-6 text-[11px] font-bold text-gray-400 uppercase tracking-wider cursor-pointer select-none"
+                                onClick={() => onSort("status")}
+                            >
+                                <span className="flex items-center group">
+                                    STATUS
+                                    <SortIcon column="status" sortBy={sortBy} sortOrder={sortOrder} />
+                                </span>
+                            </th>
+                            <th className="py-4 px-6 text-right text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                ACTIONS
+                            </th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                        {timesheets.map((timesheet) => (
+                            <tr
+                                key={timesheet.id}
+                                className="hover:bg-gray-50/30 transition-colors group"
+                            >
+                                <td className="py-5 px-6 text-sm text-gray-900 font-medium bg-[#F9FAFB] border-r border-gray-100/50 w-[140px]">
+                                    {timesheet.weekNumber}
+                                </td>
+                                <td className="py-5 px-6 text-sm text-gray-500 font-normal">
+                                    {formatDateRange(timesheet.startDate, timesheet.endDate)}
+                                </td>
+                                <td className="py-5 px-6">
+                                    <StatusBadge status={timesheet.status} />
+                                </td>
+                                <td className="py-5 px-6 text-right">
+                                    <Link
+                                        href={`/dashboard/${timesheet.id}`}
+                                        className={cn(
+                                            "text-sm font-medium transition-colors hover:underline",
+                                            getActionColor(timesheet.status)
+                                        )}
+                                    >
+                                        {getActionLabel(timesheet.status)}
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

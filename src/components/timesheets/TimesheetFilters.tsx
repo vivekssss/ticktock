@@ -1,6 +1,8 @@
 "use client";
 
 import { TimesheetStatus } from "@/types";
+import DateRangeDropdown from "./DateRangeDropdown";
+import CustomSelect from "../ui/CustomSelect";
 
 interface TimesheetFiltersProps {
     statusFilter: string;
@@ -19,46 +21,35 @@ export default function TimesheetFilters({
     onStartDateChange,
     onEndDateChange,
 }: TimesheetFiltersProps) {
-    const statuses: { value: string; label: string }[] = [
-        { value: "all", label: "All Statuses" },
+    const statuses = [
+        { value: "all", label: "Status" },
         { value: "completed", label: "Completed" },
         { value: "incomplete", label: "Incomplete" },
         { value: "missing", label: "Missing" },
     ];
 
+    const handleRangeChange = (start: string, end: string) => {
+        onStartDateChange(start);
+        onEndDateChange(end);
+    };
+
     return (
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-8">
             {/* Date range filter */}
-            <div className="flex items-center gap-2">
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => onStartDateChange(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
-                    placeholder="Start date"
-                />
-                <span className="text-gray-400 text-sm">to</span>
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => onEndDateChange(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
-                    placeholder="End date"
-                />
-            </div>
+            <DateRangeDropdown
+                startDate={startDate}
+                endDate={endDate}
+                onRangeChange={handleRangeChange}
+            />
 
             {/* Status filter */}
-            <select
+            <CustomSelect
                 value={statusFilter}
-                onChange={(e) => onStatusChange(e.target.value as TimesheetStatus | "all")}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent"
-            >
-                {statuses.map((s) => (
-                    <option key={s.value} value={s.value}>
-                        {s.label}
-                    </option>
-                ))}
-            </select>
+                onChange={(val) => onStatusChange(val)}
+                options={statuses}
+                className="w-full sm:w-44"
+                placeholder="Status"
+            />
         </div>
     );
 }

@@ -33,12 +33,28 @@ export function getStatusColor(status: string): {
 } {
     switch (status) {
         case "completed":
-            return { bg: "bg-green-50", text: "text-green-700", label: "COMPLETED" };
+            return {
+                bg: "bg-[#EBFDF5]",
+                text: "text-[#059669]",
+                label: "COMPLETED"
+            };
         case "incomplete":
-            return { bg: "bg-yellow-50", text: "text-yellow-700", label: "INCOMPLETE" };
+            return {
+                bg: "bg-[#FFFBEB]",
+                text: "text-[#D97706]",
+                label: "INCOMPLETE"
+            };
         case "missing":
-            return { bg: "bg-red-50", text: "text-red-700", label: "MISSING" };
+            return {
+                bg: "bg-[#FFF1F2]",
+                text: "text-[#E11D48]",
+                label: "MISSING"
+            };
         default:
-            return { bg: "bg-gray-50", text: "text-gray-700", label: status.toUpperCase() };
+            return {
+                bg: "bg-gray-50",
+                text: "text-gray-600",
+                label: status.toUpperCase()
+            };
     }
 }

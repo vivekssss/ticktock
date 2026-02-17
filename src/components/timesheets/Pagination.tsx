@@ -1,5 +1,6 @@
 "use client";
 
+import CustomSelect from "../ui/CustomSelect";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
@@ -18,6 +19,12 @@ export default function Pagination({
     onPageChange,
     onPageSizeChange,
 }: PaginationProps) {
+    const pageSizeOptions = [
+        { value: 5, label: "5" },
+        { value: 10, label: "10" },
+        { value: 20, label: "20" },
+    ];
+
     const getPageNumbers = () => {
         const pages: (number | string)[] = [];
 
@@ -40,20 +47,16 @@ export default function Pagination({
     };
 
     return (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-gray-100">
             {/* Page size selector */}
             <div className="flex items-center gap-2">
-                <select
+                <CustomSelect
                     value={pageSize}
-                    onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                    className="border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
-                >
-                    {[5, 10, 20].map((size) => (
-                        <option key={size} value={size}>
-                            {size} per page
-                        </option>
-                    ))}
-                </select>
+                    onChange={(val) => onPageSizeChange(val)}
+                    options={pageSizeOptions}
+                    className="w-32"
+                />
+                <span className="text-sm text-gray-500">per page</span>
             </div>
 
             {/* Page numbers */}
